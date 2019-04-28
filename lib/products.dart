@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import './pages/product.dart';
-
 class Products extends StatelessWidget {
   final List<Map<String, dynamic>> products;
 
@@ -14,7 +12,35 @@ class Products extends StatelessWidget {
         child: Column(
       children: <Widget>[
         Image.asset(products[index]['image']),
-        Text(products[index]['title']),
+        Container(
+          //margin:EdgeInsets.symmetric(vertical:10.0),
+          margin: EdgeInsets.only(top: 10.0),
+          //padding:EdgeInsets.only(top:10.0),
+          //color:Colors.red,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Text(products[index]['title'],
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  )),
+              SizedBox(width: 20.0),
+              Container(
+                padding:EdgeInsets.symmetric(horizontal:6.0,vertical:2.5),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius:BorderRadius.circular(5.0)
+                  ),
+                child: Text('USD\$ ${products[index]["price"].toString()}',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      color:Colors.white
+                    )),
+              ),
+            ],
+          ),
+        ),
         ButtonBar(
           alignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -22,7 +48,8 @@ class Products extends StatelessWidget {
               child: Text('Details'),
               onPressed: () {
                 print(products[index]['title'] + ' details pressed. ');
-                Navigator.pushNamed<bool>(context,'/product/'+index.toString());
+                Navigator.pushNamed<bool>(
+                    context, '/product/' + index.toString());
               },
             )
           ],

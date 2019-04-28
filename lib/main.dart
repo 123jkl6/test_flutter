@@ -16,7 +16,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final List<Map<String, dynamic>> _products = [];
+  final List<Map<String, dynamic>> _products = [
+    {
+      'title':'First Product',
+      'description':'This is added so the list would not be empty initially. ' , 
+      'price' : 12.99,
+      'image':'assets/food.jpg'
+    }
+  ];
 
   @override
   void initState() {
@@ -41,7 +48,9 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
           brightness: Brightness.light,
           primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple),
+          accentColor: Colors.deepPurple,
+          fontFamily: 'Oswald'
+        ),
       // '/' and home are reserved, use one or the other.
       //home: AuthPage(),
       routes: {
