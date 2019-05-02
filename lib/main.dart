@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
-import './product_manager.dart';
 import './pages/auth.dart';
 import './pages/product.dart';
 import './pages/products.dart';
 import './pages/manage_products.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  //debugPaintSizeEnabled = true;
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -19,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   final List<Map<String, dynamic>> _products = [
     {
       'title':'First Product',
-      'description':'This is added so the list would not be empty initially. ' , 
+      'description':'This is added so the list would not be empty initially. This product awesome.\n This product is superbly awesome.' , 
       'price' : 12.99,
       'image':'assets/food.jpg'
     }
@@ -36,6 +39,12 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _updateProduct(int index, Map<String,dynamic> product){
+    setState((){
+      _products[index] = product;
+    });
+  }
+
   void _deleteProduct(int index) {
     setState(() {
       _products.removeAt(index);
@@ -49,7 +58,8 @@ class _MyAppState extends State<MyApp> {
           brightness: Brightness.light,
           primarySwatch: Colors.deepOrange,
           accentColor: Colors.deepPurple,
-          fontFamily: 'Oswald'
+          fontFamily: 'Oswald',
+          buttonColor:Colors.deepPurple,
         ),
       // '/' and home are reserved, use one or the other.
       //home: AuthPage(),
@@ -66,6 +76,8 @@ class _MyAppState extends State<MyApp> {
           return ManageProducts(
             addProduct: _addProduct,
             deleteProduct: _deleteProduct,
+            updateProduct:_updateProduct,
+            products:_products,
           );
         }
       },
@@ -80,6 +92,8 @@ class _MyAppState extends State<MyApp> {
             return ProductPage(
               title: _products[index]['title'],
               imageUrl: _products[index]['image'],
+              price:_products[index]['price'],
+              description: _products[index]['description'],
             );
           });
         }
