@@ -50,7 +50,7 @@ class ManageProducts extends StatelessWidget {
             ProductEditPage(
               addProduct: addProduct,
             ),
-            ProductListPage(updateProduct:updateProduct,products: products,)
+            ProductListPage(updateProduct:updateProduct,deleteProduct:deleteProduct,products: products,)
           ],
         ),
       ),

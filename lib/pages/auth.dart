@@ -76,7 +76,7 @@ class _AuthPageState extends State<AuthPage> {
     }
     _formKey.currentState.save();
     //allow only one user and pass
-    if (_userAuth['email']!='nicholasngchuxu@gmail.com' || _userAuth['password']!='admin'){
+    if (_userAuth['email']!='nicholasngchuxu@gmail.com' || _userAuth['password']!='admin123'){
       print('Not Authorized. ');
       return;
     }
