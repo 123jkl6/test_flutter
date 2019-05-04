@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
+import '../scoped_models/main.dart';
 
 import '../widgets/products/products.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-
-  ProductsPage({this.products});
-
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: Column(children: <Widget>[
@@ -40,17 +39,19 @@ class ProductsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Haha'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.favorite),
-            onPressed: () {
-              print('Favorite filter pressed.');
-            },
-          ),
+          ScopedModelDescendant<MainModel>(builder:
+              (BuildContext context, Widget child, MainModel model) {
+            return IconButton(
+              icon: Icon(model.showFavoritesMode ? Icons.favorite : Icons.favorite_border),
+              onPressed: () {
+                print('Favorite filter pressed.');
+                model.toggleDisplayFavorites();
+              },
+            );
+          }),
         ],
       ),
-      body: Products(
-        products: products,
-      ),
+      body: Products(),
     );
   }
 }

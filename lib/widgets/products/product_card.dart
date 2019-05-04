@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
+import '../../scoped_models/main.dart';
+
+import '../../models/product.dart';
 
 import './price_tag.dart';
 import './address_tag.dart';
 import '../ui_elements/title_default.dart';
 
 class ProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final int index;
 
-  ProductCard({this.product, this.index});
+  ProductCard({@required this.product, @required this.index}) {
+    print(product);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return _buildProductItem(context, index);
+    return _buildProductItem(context);
   }
 
   Widget _buildTitlePriceRow() {
@@ -21,9 +28,9 @@ class ProductCard extends StatelessWidget {
       children: <Widget>[
         Flexible(
           flex: 10,
-          child: TitleDefault(title: product['title']),
+          child: TitleDefault(title: product.title),
         ),
-        PriceTag(product['price'].toString()),
+        PriceTag(product.price.toString()),
       ],
     );
   }
@@ -36,26 +43,31 @@ class ProductCard extends StatelessWidget {
           icon: Icon(Icons.info),
           color: Theme.of(context).accentColor,
           onPressed: () {
-            print(product['title'] + ' details pressed. ');
+            print(product.title + ' details pressed. ');
             Navigator.pushNamed<bool>(context, '/product/' + index.toString());
           },
         ),
-        IconButton(
-          icon: Icon(Icons.favorite_border),
-          color: Colors.red,
-          onPressed: () {
-            print(product['title'] + ' favorite pressed. ');
-          },
-        ),
+        ScopedModelDescendant<MainModel>(
+            builder: (BuildContext context, Widget child, MainModel model) {
+          return IconButton(
+            icon: Icon(model.products[index].isFavorite ? Icons.favorite : Icons.favorite_border),
+            color: Colors.red,
+            onPressed: () {
+              print(product.title + ' favorite pressed. ');
+              model.selectProduct(index);
+              model.toggleFavoriteStatus();
+            },
+          );
+        }),
       ],
     );
   }
 
-  Widget _buildProductItem(BuildContext context, int index) {
+  Widget _buildProductItem(BuildContext context) {
     return Card(
         child: Column(
       children: <Widget>[
-        Image.asset(product['image']),
+        Image.asset(product.image),
         Container(
           //margin:EdgeInsets.symmetric(vertical:10.0),
           margin: EdgeInsets.only(top: 10.0),
@@ -63,7 +75,7 @@ class ProductCard extends StatelessWidget {
           //color:Colors.red,
           child: _buildTitlePriceRow(),
         ),
-        SizedBox(width: 20.0),
+        SizedBox(width: 8.0),
         AddressTag(address: 'Union Square, San Francisco'),
         _buildButtonBar(context),
       ],
