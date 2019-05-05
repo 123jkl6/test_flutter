@@ -29,7 +29,8 @@ class _AuthPageState extends State<AuthPage> {
       decoration: InputDecoration(
           labelText: 'Username', filled: true, fillColor: Colors.white),
       validator: (String value) {
-        if (value.isEmpty || !RegExp(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$').hasMatch(value)) {
+        if (value.isEmpty ||
+            !RegExp(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$').hasMatch(value)) {
           return "Email is required and must be a valid email address. ";
         }
       },
@@ -69,22 +70,24 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   Widget _buildLoginButton() {
-    return Center(child: RaisedButton(child: Text('LOGIN'), onPressed: login));
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Center(
+          child: RaisedButton(child: Text('LOGIN'), onPressed: ()=> login(model)));
+    });
   }
 
-  void login() {
+  void login(MainModel model) {
     print(_userAuth);
-    if (!_formKey.currentState.validate()){
-      //if not valid, stop execution. 
+    if (!_formKey.currentState.validate()) {
+      //if not valid, stop execution.
       return;
     }
     _formKey.currentState.save();
-    //allow only one user and pass
-    if (_userAuth['email']!='nicholasngchuxu@gmail.com' || _userAuth['password']!='admin123'){
-      print('Not Authorized. ');
-      return;
-    }
-    Navigator.pushReplacementNamed(context, '/');
+
+    model.login(_userAuth['email'],_userAuth['password']);
+
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override
@@ -100,7 +103,7 @@ class _AuthPageState extends State<AuthPage> {
         decoration: BoxDecoration(image: _buildBackgroundImage()),
         padding: EdgeInsets.all(10.0),
         child: Form(
-          key:_formKey,
+          key: _formKey,
           child: Center(
             child: SingleChildScrollView(
               child: Container(

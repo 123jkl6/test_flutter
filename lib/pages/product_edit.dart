@@ -108,14 +108,14 @@ class _CreateProductPageState extends State<ProductEditPage> {
         color: Theme.of(context).primaryColor,
         textColor: Theme.of(context).primaryColorLight,
         child: Text('Save'),
-        onPressed: () => saveAction(
-            model.addProduct, model.updateProduct, model.selectedProduct),
+        onPressed: () => saveAction(model.addProduct, model.updateProduct,
+            model.selectProduct, model.selectedProduct),
       );
     });
   }
 
-  void saveAction(
-      Function addProduct, Function updateProduct, Product product) {
+  void saveAction(Function addProduct, Function updateProduct,
+      Function selectProduct, Product product) {
     if (!_formKey.currentState.validate()) {
       //stop executing if validation fails.
       return;
@@ -123,19 +123,23 @@ class _CreateProductPageState extends State<ProductEditPage> {
     _formKey.currentState.save();
     print(_formData['title'] + ' is being saved.');
 
-    final Product finalProduct = Product(
-      title: _formData['title'],
-      description: _formData['description'],
-      image: _formData['image'],
-      price: _formData['price'],
-    );
-
     if (product == null) {
-      addProduct(finalProduct);
+      addProduct(
+        title: _formData['title'],
+        description: _formData['description'],
+        image: _formData['image'],
+        price: _formData['price'],
+      );
     } else {
-      updateProduct(finalProduct);
+      updateProduct(
+        title: _formData['title'],
+        description: _formData['description'],
+        image: _formData['image'],
+        price: _formData['price'],
+      );
     }
-    Navigator.pushReplacementNamed(context, '/');
+    Navigator.pushReplacementNamed(context, '/home').then((_) => selectProduct(
+        null)); //reset selectedIndex only after rebuilding the new page
   }
 
   Widget buildGestureDetector() {
@@ -143,8 +147,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return GestureDetector(
         onTap: () {
-          saveAction(
-              model.addProduct, model.updateProduct, model.selectedProduct);
+          saveAction(model.addProduct, model.updateProduct, model.selectProduct,
+              model.selectedProduct);
         },
         child: Container(
           color: Colors.green,

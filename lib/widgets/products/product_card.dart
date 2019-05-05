@@ -7,6 +7,7 @@ import '../../models/product.dart';
 
 import './price_tag.dart';
 import './address_tag.dart';
+import './user_tag.dart';
 import '../ui_elements/title_default.dart';
 
 class ProductCard extends StatelessWidget {
@@ -50,7 +51,7 @@ class ProductCard extends StatelessWidget {
         ScopedModelDescendant<MainModel>(
             builder: (BuildContext context, Widget child, MainModel model) {
           return IconButton(
-            icon: Icon(model.products[index].isFavorite ? Icons.favorite : Icons.favorite_border),
+            icon: Icon(model.allProducts[index].isFavorite ? Icons.favorite : Icons.favorite_border),
             color: Colors.red,
             onPressed: () {
               print(product.title + ' favorite pressed. ');
@@ -77,6 +78,7 @@ class ProductCard extends StatelessWidget {
         ),
         SizedBox(width: 8.0),
         AddressTag(address: 'Union Square, San Francisco'),
+        UserTag(user:product.userEmail),
         _buildButtonBar(context),
       ],
     ));

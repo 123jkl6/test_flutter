@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../scoped_models/products.dart';
+import '../scoped_models/main.dart';
 
 import '../widgets/ui_elements/title_default.dart';
 
@@ -64,28 +64,28 @@ class ProductPage extends StatelessWidget {
         //is not triggered twice causing the app to crash.
         return Future.value(false);
       },
-      child: ScopedModelDescendant(
-          builder: (BuildContext context, Widget child, ProductsModel model) {
+      child: ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget child, MainModel model) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(model.products[productIndex].title),
+            title: Text(model.allProducts[productIndex].title),
           ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Image.asset(model.products[productIndex].image),
+              Image.asset(model.allProducts[productIndex].image),
               Container(
                 padding: EdgeInsets.all(10.0),
-                child: TitleDefault(title: model.products[productIndex].title),
+                child: TitleDefault(title: model.allProducts[productIndex].title),
               ),
-              _buildAddressPriceRow(model.products[productIndex].price.toString()),
+              _buildAddressPriceRow(model.allProducts[productIndex].price.toString()),
               Container(
                 margin: EdgeInsets.only(top: 10.0),
                 padding: EdgeInsets.all(10.0),
                 alignment: Alignment.center,
                 child: Text(
-                  model.products[productIndex].description,
+                  model.allProducts[productIndex].description,
                   textAlign: TextAlign.center,
                 ),
               ),
