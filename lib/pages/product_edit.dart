@@ -104,13 +104,15 @@ class _CreateProductPageState extends State<ProductEditPage> {
   Widget _buildSaveButton() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return RaisedButton(
-        color: Theme.of(context).primaryColor,
-        textColor: Theme.of(context).primaryColorLight,
-        child: Text('Save'),
-        onPressed: () => saveAction(model.addProduct, model.updateProduct,
-            model.selectProduct, model.selectedProduct),
-      );
+      return model.isLoading
+          ? Center(child: CircularProgressIndicator())
+          : RaisedButton(
+              color: Theme.of(context).primaryColor,
+              textColor: Theme.of(context).primaryColorLight,
+              child: Text('Save'),
+              onPressed: () => saveAction(model.addProduct, model.updateProduct,
+                  model.selectProduct, model.selectedProduct),
+            );
     });
   }
 
@@ -129,17 +131,23 @@ class _CreateProductPageState extends State<ProductEditPage> {
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
-      );
+      ).then((_) {
+        Navigator.pushReplacementNamed(context, '/home').then((_) =>
+            selectProduct(
+                null)); //reset selectedIndex only after rebuilding the new page
+      });
     } else {
       updateProduct(
         title: _formData['title'],
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
-      );
+      ).then((_) {
+        Navigator.pushReplacementNamed(context, '/home').then((_) =>
+            selectProduct(
+                null)); //reset selectedIndex only after rebuilding the new page
+      });;
     }
-    Navigator.pushReplacementNamed(context, '/home').then((_) => selectProduct(
-        null)); //reset selectedIndex only after rebuilding the new page
   }
 
   Widget buildGestureDetector() {

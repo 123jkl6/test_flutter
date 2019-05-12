@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
             return ProductsPage(model);
           },
           '/admin': (BuildContext context) {
-            return ManageProducts();
+            return ManageProducts(model:model);
           }
         },
         onGenerateRoute: (RouteSettings settings) {

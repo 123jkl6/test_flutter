@@ -16,9 +16,8 @@ class ProductsPage extends StatefulWidget {
 }
 
 class _ProductsPageState extends State<ProductsPage> {
-
   @override
-  initState(){
+  initState() {
     widget.model.fetchProducts();
   }
 
@@ -47,14 +46,14 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildProductsList(){
-    return ScopedModelDescendant(builder:(BuildContext context, Widget child, MainModel model){
-      Widget content = Center(child:Text('No products found. '));
-      if (model.displayedProducts.length > 0 && !model.isLoading){
+  Widget _buildProductsList() {
+    return ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      Widget content = Center(child: Text('No products found. '));
+      if (model.displayedProducts.length > 0 && !model.isLoading) {
         content = Products();
-      }
-      else if (model.isLoading){
-        content = CircularProgressIndicator();
+      } else if (model.isLoading) {
+        content = Center(child: CircularProgressIndicator());
       }
 
       return content;
@@ -69,10 +68,12 @@ class _ProductsPageState extends State<ProductsPage> {
       appBar: AppBar(
         title: Text('Haha'),
         actions: <Widget>[
-          ScopedModelDescendant<MainModel>(builder:
-              (BuildContext context, Widget child, MainModel model) {
+          ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
             return IconButton(
-              icon: Icon(model.showFavoritesMode ? Icons.favorite : Icons.favorite_border),
+              icon: Icon(model.showFavoritesMode
+                  ? Icons.favorite
+                  : Icons.favorite_border),
               onPressed: () {
                 print('Favorite filter pressed.');
                 model.toggleDisplayFavorites();
