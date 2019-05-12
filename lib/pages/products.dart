@@ -4,6 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../scoped_models/main.dart';
 
 import '../widgets/products/products.dart';
+import '../widgets/ui_elements/logout_list.dart';
 
 class ProductsPage extends StatefulWidget {
   final MainModel model;
@@ -19,6 +20,7 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   initState() {
     widget.model.fetchProducts();
+    super.initState();
   }
 
   Widget _buildSideDrawer(BuildContext context) {
@@ -35,9 +37,12 @@ class _ProductsPageState extends State<ProductsPage> {
           onTap: () {
             Navigator.pushReplacementNamed(context, '/admin');
           },
+          
         ),
+        Divider(),
+          LogoutListTile(),
         ListTile(
-          title: Text('Auth'),
+          title: Text('Logout'),
           onTap: () {
             Navigator.pushReplacementNamed(context, '/');
           },
@@ -56,7 +61,9 @@ class _ProductsPageState extends State<ProductsPage> {
         content = Center(child: CircularProgressIndicator());
       }
 
-      return content;
+      return RefreshIndicator(onRefresh: () {
+        return model.fetchProducts();
+      }, child: content);
     });
   }
 

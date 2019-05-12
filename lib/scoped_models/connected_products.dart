@@ -1,9 +1,13 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
+
 import 'dart:async';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:convert';
 
+import '../models/auth.dart';
 import '../models/product.dart';
 import '../models/user.dart';
 
@@ -22,42 +26,8 @@ mixin ConnectedProductsModel on Model {
     //)
   ];
   User _authenticatedUser;
-  int _selectedProductIndex;
+  String _selectedProductId;
   bool _isLoading = false;
-
-  Future<Null> addProduct(
-      {String title, String description, String image, double price}) {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, dynamic> productData = {
-      'title': title,
-      'description': description,
-      'image':
-          'https://upload.wikimedia.org/wikipedia/commons/8/88/Philippine_Food.jpg',
-      'price': price,
-      'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id,
-    };
-
-    return http
-        .post(_url + 'products.json', body: json.encode(productData))
-        .then((http.Response response) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      print(responseData);
-      _isLoading = false;
-      final Product product = Product(
-        id: responseData['id'],
-        title: title,
-        description: description,
-        image: image,
-        price: price,
-        userEmail: _authenticatedUser.email,
-        userId: _authenticatedUser.id,
-      );
-      _products.add(product);
-      notifyListeners();
-    });
-  }
 }
 
 mixin ProductsModel on ConnectedProductsModel {
@@ -78,22 +48,79 @@ mixin ProductsModel on ConnectedProductsModel {
     return allProducts;
   }
 
+  String get selectedProductId {
+    return _selectedProductId;
+  }
+
   int get selectedProductIndex {
-    return _selectedProductIndex;
+    return _products.indexWhere((Product product) {
+      return product.id == _selectedProductId;
+    });
   }
 
   Product get selectedProduct {
-    if (_selectedProductIndex == null) {
+    if (_selectedProductId == null) {
       return null;
     }
-    return _products[_selectedProductIndex];
+    return _products.firstWhere((Product el) {
+      return el.id == _selectedProductId;
+    });
   }
 
   bool get showFavoritesMode {
     return _showFavorites;
   }
 
-  Future<Null> updateProduct(
+  Future<bool> addProduct(
+      {String title, String description, String image, double price}) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> productData = {
+      'title': title,
+      'description': description,
+      'image':
+          'https://upload.wikimedia.org/wikipedia/commons/8/88/Philippine_Food.jpg',
+      'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id,
+    };
+
+    try {
+      //await calls then
+      final http.Response response = await http.post(
+          _url + 'products.json?auth=${_authenticatedUser.token}',
+          body: json.encode(productData));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      print(responseData);
+      _isLoading = false;
+      final Product product = Product(
+        id: responseData['id'],
+        title: title,
+        description: description,
+        image: image,
+        price: price,
+        userEmail: _authenticatedUser.email,
+        userId: _authenticatedUser.id,
+      );
+      _products.add(product);
+      notifyListeners();
+      _selectedProductId = null;
+      return true;
+    } catch (error) {
+      print(error);
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> updateProduct(
       {String title, String description, String image, double price}) {
     _isLoading = true;
     notifyListeners();
@@ -107,9 +134,12 @@ mixin ProductsModel on ConnectedProductsModel {
       'userId': selectedProduct.userId,
     };
     return http
-        .put(_url + 'products/${selectedProduct.id}.json',
+        .put(
+            _url +
+                'products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updatedData))
         .then((http.Response response) {
+      print(response);
       _isLoading = false;
 
       final Product product = Product(
@@ -122,43 +152,56 @@ mixin ProductsModel on ConnectedProductsModel {
         userId: _authenticatedUser.id,
       );
 
-      _products[_selectedProductIndex] = product;
-       notifyListeners();
+      _products[selectedProductIndex] = product;
+      notifyListeners();
+
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
-   
   }
 
-  void deleteProduct() {
+  Future<bool> deleteProduct() {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
-    _products.removeAt(_selectedProductIndex);
+    _products.removeAt(selectedProductIndex);
 
     //reset
-    _selectedProductIndex=null; 
-    http.delete(_url+'products/$deletedProductId.json')
-    .then((http.Response response){
+    _selectedProductId = null;
+    return http
+        .delete(_url +
+            'products/$deletedProductId.json?auth=${_authenticatedUser.token}')
+        .then((http.Response response) {
       _isLoading = false;
-      
+
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
-    
   }
 
-  void selectProduct(int index) {
-    _selectedProductIndex = index;
+  void selectProduct(String productId) {
+    _selectedProductId = productId;
 
     //add additional check before notifying listeners
     //This is because page is still in animation while pressing back.
-    if (index != null) {
+    if (_selectedProductId != null) {
       notifyListeners();
     }
   }
 
-  void fetchProducts() {
+  Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-
-    http.get(_url + 'products.json').then((http.Response response) {
+    print(_authenticatedUser.token);
+    return http
+        .get(_url + 'products.json?auth=${_authenticatedUser.token}')
+        .then<Null>((http.Response response) {
       print(json.decode(response.body));
 
       _isLoading = false;
@@ -185,14 +228,18 @@ mixin ProductsModel on ConnectedProductsModel {
 
       _products = fetchedProductList;
       notifyListeners();
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
     });
   }
 
   void toggleFavoriteStatus() {
-    final Product selectedProduct = _products[_selectedProductIndex];
+    final Product selectedProduct = _products[selectedProductIndex];
     final bool isCurrentlyFavorite = selectedProduct.isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
     final Product updatedProduct = Product(
+      id: selectedProduct.id,
       title: selectedProduct.title,
       description: selectedProduct.description,
       image: selectedProduct.image,
@@ -202,7 +249,7 @@ mixin ProductsModel on ConnectedProductsModel {
       isFavorite: newFavoriteStatus,
     );
 
-    _products[_selectedProductIndex] = updatedProduct;
+    _products[selectedProductIndex] = updatedProduct;
 
     //inform ScopedModel there is a change in state
     notifyListeners();
@@ -216,14 +263,80 @@ mixin ProductsModel on ConnectedProductsModel {
 }
 
 mixin UserModel on ConnectedProductsModel {
-  void login(String email, String password) {
-    //allow only one user and pass
-    if (email != 'nicholasngchuxu@gmail.com' || password != 'admin123') {
-      print('Not Authorized. ');
-      return;
+
+  User get authenticatedUser{
+    return _authenticatedUser;
+  }
+
+  Future<Map<String, dynamic>> authenticate(
+      String email, String password, AuthMode authMode) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> authData = {
+      'email': email,
+      'password': password,
+      'returnSecureToken': true,
+    };
+    http.Response response;
+    if (authMode == AuthMode.Login) {
+      response = await http.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyAwsYQRLW5FZXnIsC1Yr39qowCkg2ePDBk',
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(authData),
+      );
+    } else {
+      response = await http.post(
+        "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyAwsYQRLW5FZXnIsC1Yr39qowCkg2ePDBk",
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(authData),
+      );
     }
-    _authenticatedUser =
-        User(id: 'hardcoded', email: email, password: password);
+
+    _isLoading = true;
+    bool hasError = true;
+    final Map<String, dynamic> responseBody = json.decode(response.body);
+    print(responseBody);
+    String message = 'Service not available. ';
+    if (responseBody.containsKey('idToken')) {
+      hasError = false;
+      message = 'Authentication succeeded';
+      _authenticatedUser = User(
+          id: responseBody['localId'],
+          email: email,
+          token: responseBody['idToken']);
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('test_flutter_token', responseBody['idToken']);
+          prefs.setString('test_flutter_user_email', email);
+          prefs.setString('test_flutter_user_id', responseBody['localId']);
+    } else if (responseBody['error']['message'] == 'EMAIL_NOT_FOUND') {
+      message = 'Email not found.';
+    } else if (responseBody['error']['message'] == 'INVALID_PASSWORD') {
+      message = 'Password is invalid. ';
+    } else if (responseBody['error']['message'] == 'EMAIL_EXISTS') {
+      message = 'Email already exists';
+    }
+    _isLoading = false;
+    notifyListeners();
+    return {'success': !hasError, 'message': message};
+  }
+
+  void authenticateOnStartup() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('test_flutter_token');
+    if (token!=null){
+      final String userEmail = prefs.getString('test_flutter_user_email');
+      final String userId = prefs.getString('test_flutter_user_id');
+      _authenticatedUser = User(id:userId,email: userEmail,token: token);
+      notifyListeners();
+    }
+  }
+
+  void logout() async {
+    _authenticatedUser = null;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('test_flutter_token');
+    prefs.remove('test_flutter_user_email');
+    prefs.remove('test_flutter_user_id');
   }
 }
 

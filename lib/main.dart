@@ -4,6 +4,8 @@ import 'package:scoped_model/scoped_model.dart';
 
 import './scoped_models/main.dart';
 
+import './models/product.dart';
+
 import './pages/auth.dart';
 import './pages/product.dart';
 import './pages/products.dart';
@@ -22,11 +24,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final MainModel _model = MainModel();
+  @override
+  void iniState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final MainModel model = MainModel();
     return ScopedModel<MainModel>(
-      model: model, // only one instance in entire app
+      model: _model, // only one instance in entire app
       child: MaterialApp(
         theme: ThemeData(
           brightness: Brightness.light,
@@ -39,13 +46,15 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) {
-            return AuthPage();
+            return _model.authenticatedUser == null
+                ? AuthPage()
+                : ProductsPage(_model);
           },
           '/home': (BuildContext context) {
-            return ProductsPage(model);
+            return ProductsPage(_model);
           },
           '/admin': (BuildContext context) {
-            return ManageProducts(model:model);
+            return ManageProducts(model: _model);
           }
         },
         onGenerateRoute: (RouteSettings settings) {
@@ -54,16 +63,20 @@ class _MyAppState extends State<MyApp> {
             return null;
           }
           if (pathElements[1] == 'product') {
-            final int index = int.parse(pathElements[2]);
+            final String productId = pathElements[2];
+            final Product product =
+                _model.allProducts.firstWhere((Product product) {
+              return product.id == productId;
+            });
             return MaterialPageRoute<bool>(builder: (context) {
-              return ProductPage(productIndex: index);
+              return ProductPage(product: product);
             });
           }
           return null;
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(builder: (BuildContext context) {
-            return ProductsPage(model);
+            return ProductsPage(_model);
           });
         },
       ),

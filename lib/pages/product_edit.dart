@@ -131,10 +131,26 @@ class _CreateProductPageState extends State<ProductEditPage> {
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
-      ).then((_) {
-        Navigator.pushReplacementNamed(context, '/home').then((_) =>
-            selectProduct(
-                null)); //reset selectedIndex only after rebuilding the new page
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/home').then((_) =>
+              selectProduct(
+                  null)); //reset selectedIndex only after rebuilding the new page
+        } else {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Something went wrong.'),
+                  content: Text('Please try again later'),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('Okay')),
+                  ],
+                );
+              });
+        }
       });
     } else {
       updateProduct(
@@ -142,11 +158,28 @@ class _CreateProductPageState extends State<ProductEditPage> {
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
-      ).then((_) {
-        Navigator.pushReplacementNamed(context, '/home').then((_) =>
-            selectProduct(
-                null)); //reset selectedIndex only after rebuilding the new page
-      });;
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/home').then((_) =>
+              selectProduct(
+                  null)); //reset selectedIndex only after rebuilding the new page
+        } else {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Something went wrong.'),
+                  content: Text('Please try again later'),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('Okay')),
+                  ],
+                );
+              });
+        }
+      });
+      ;
     }
   }
 
@@ -207,7 +240,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
       final product = model.selectedProduct;
       final Widget pageContent = _buildPageContent(context, product);
 
-      return model.selectedProductIndex == null
+      return model.selectedProductIndex == -1
           ? pageContent
           : Scaffold(
               appBar: AppBar(

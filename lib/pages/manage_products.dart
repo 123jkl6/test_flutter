@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../scoped_models/main.dart';
 
+import '../widgets/ui_elements/logout_list.dart';
+
 import './product_edit.dart';
 import './product_list.dart';
 
@@ -26,7 +28,9 @@ class ManageProducts extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacementNamed(context, '/home');
             },
-          )
+          ),
+          Divider(),
+          LogoutListTile(),
         ],
       ),
     );

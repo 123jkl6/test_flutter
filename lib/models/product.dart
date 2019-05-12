@@ -11,7 +11,7 @@ class Product {
   final bool isFavorite;
 
   Product({
-    this.id,
+    @required this.id,
     @required this.title,
     @required this.description,
     @required this.image,

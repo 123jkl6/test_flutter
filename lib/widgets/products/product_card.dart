@@ -37,38 +37,46 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildButtonBar(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.info),
-          color: Theme.of(context).accentColor,
-          onPressed: () {
-            print(product.title + ' details pressed. ');
-            Navigator.pushNamed<bool>(context, '/product/' + index.toString());
-          },
-        ),
-        ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-          return IconButton(
-            icon: Icon(model.allProducts[index].isFavorite ? Icons.favorite : Icons.favorite_border),
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return ButtonBar(
+        alignment: MainAxisAlignment.center,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.info),
+            color: Theme.of(context).accentColor,
+            onPressed: () {
+              print(product.title + ' details pressed. ');
+              Navigator.pushNamed<bool>(
+                  context, '/product/' + model.allProducts[index].id);
+            },
+          ),
+          IconButton(
+            icon: Icon(model.allProducts[index].isFavorite
+                ? Icons.favorite
+                : Icons.favorite_border),
             color: Colors.red,
             onPressed: () {
               print(product.title + ' favorite pressed. ');
-              model.selectProduct(index);
+              model.selectProduct(model.allProducts[index].id);
               model.toggleFavoriteStatus();
             },
-          );
-        }),
-      ],
-    );
+          )
+        ],
+      );
+    });
   }
 
   Widget _buildProductItem(BuildContext context) {
     return Card(
         child: Column(
       children: <Widget>[
-        Image.network(product.image),
+        FadeInImage(
+            image: NetworkImage(product.image),
+            height: 300.0,
+            fit: BoxFit.cover,
+            fadeInDuration: Duration(milliseconds: 700),
+            placeholder: AssetImage('assets/food.jpg')),
         Container(
           //margin:EdgeInsets.symmetric(vertical:10.0),
           margin: EdgeInsets.only(top: 10.0),
@@ -78,7 +86,7 @@ class ProductCard extends StatelessWidget {
         ),
         SizedBox(width: 8.0),
         AddressTag(address: 'Union Square, San Francisco'),
-        UserTag(user:product.userEmail),
+        UserTag(user: product.userEmail),
         _buildButtonBar(context),
       ],
     ));

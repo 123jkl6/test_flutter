@@ -4,12 +4,14 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped_models/main.dart';
 
+import '../models/product.dart';
+
 import '../widgets/ui_elements/title_default.dart';
 
 class ProductPage extends StatelessWidget {
-  final int productIndex;
+  final Product product;
 
-  ProductPage({this.productIndex});
+  ProductPage({this.product});
 
   Widget _buildAddressPriceRow(String price) {
     return Row(
@@ -64,28 +66,31 @@ class ProductPage extends StatelessWidget {
         //is not triggered twice causing the app to crash.
         return Future.value(false);
       },
-      child: ScopedModelDescendant<MainModel>(
-          builder: (BuildContext context, Widget child, MainModel model) {
-        return Scaffold(
+      child:Scaffold(
           appBar: AppBar(
-            title: Text(model.allProducts[productIndex].title),
+            title: Text(product.title),
           ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Image.network(model.allProducts[productIndex].image),
+              FadeInImage(
+            image: NetworkImage(product.image),
+            height: 300.0,
+            fit: BoxFit.cover,
+            fadeInDuration: Duration(milliseconds: 700),
+            placeholder: AssetImage('assets/food.jpg')),
               Container(
                 padding: EdgeInsets.all(10.0),
-                child: TitleDefault(title: model.allProducts[productIndex].title),
+                child: TitleDefault(title: product.title),
               ),
-              _buildAddressPriceRow(model.allProducts[productIndex].price.toString()),
+              _buildAddressPriceRow(product.price.toString()),
               Container(
                 margin: EdgeInsets.only(top: 10.0),
                 padding: EdgeInsets.all(10.0),
                 alignment: Alignment.center,
                 child: Text(
-                  model.allProducts[productIndex].description,
+                  product.description,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -102,8 +107,8 @@ class ProductPage extends StatelessWidget {
               //     ))
             ],
           ),
-        );
-      }),
+        ),
+      
     );
   }
 }
