@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:map_view/map_view.dart';
 
 import './scoped_models/main.dart';
 
@@ -13,6 +14,7 @@ import './pages/manage_products.dart';
 
 void main() {
   //debugPaintSizeEnabled = true;
+  MapView.setApiKey('AIzaSyASUlBYy7YODpbnRDBUgsXBINAEpY8GlmI');
   runApp(MyApp());
 }
 
@@ -28,7 +30,7 @@ class _MyAppState extends State<MyApp> {
   bool _isAuthenticated = false;
 
   @override
-  void iniState() {
+  void initState() {
     _model.authenticateOnStartup();
     _model.userSubject.listen((isAuthenticated) {
       setState(() {
@@ -55,7 +57,7 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) {
-            return _isAuthenticated
+            return !_isAuthenticated
                 ? AuthPage()
                 : ProductsPage(_model);
           },
@@ -63,7 +65,7 @@ class _MyAppState extends State<MyApp> {
           //   return ProductsPage(_model);
           // },
           '/admin': (BuildContext context) {
-            return _isAuthenticated
+            return !_isAuthenticated
                 ? AuthPage()
                 : ManageProducts(model: _model);
           }

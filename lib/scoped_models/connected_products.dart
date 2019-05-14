@@ -196,7 +196,7 @@ mixin ProductsModel on ConnectedProductsModel {
     }
   }
 
-  Future<Null> fetchProducts() {
+  Future<Null> fetchProducts({onlyForUser = false}) {
     _isLoading = true;
     notifyListeners();
     return http
@@ -222,11 +222,20 @@ mixin ProductsModel on ConnectedProductsModel {
           price: productData['price'],
           userEmail: productData['userEmail'],
           userId: productData['userId'],
+          isFavorite: productData['wishlistUsers'] == null
+              ? false
+              : (productData['wishlistUsers'] as Map<String, dynamic>)
+                  .containsKey(_authenticatedUser.id),
         );
         fetchedProductList.add(product);
       });
 
-      _products = fetchedProductList;
+      //filter
+      _products = onlyForUser
+          ? fetchedProductList.where((Product product) {
+              return product.userId == _authenticatedUser.id;
+            }).toList()
+          : fetchedProductList;
       notifyListeners();
     }).catchError((error) {
       _isLoading = false;
