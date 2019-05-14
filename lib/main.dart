@@ -25,13 +25,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
+  bool _isAuthenticated = false;
+
   @override
   void iniState() {
+    _model.authenticateOnStartup();
+    _model.userSubject.listen((isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD MAIN');
     return ScopedModel<MainModel>(
       model: _model, // only one instance in entire app
       child: MaterialApp(
@@ -46,18 +55,25 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) {
-            return _model.authenticatedUser == null
+            return _isAuthenticated
                 ? AuthPage()
                 : ProductsPage(_model);
           },
-          '/home': (BuildContext context) {
-            return ProductsPage(_model);
-          },
+          // '/home': (BuildContext context) {
+          //   return ProductsPage(_model);
+          // },
           '/admin': (BuildContext context) {
-            return ManageProducts(model: _model);
+            return _isAuthenticated
+                ? AuthPage()
+                : ManageProducts(model: _model);
           }
         },
         onGenerateRoute: (RouteSettings settings) {
+          if (!_isAuthenticated){
+            return MaterialPageRoute<bool>(builder: (context) {
+              return AuthPage();
+            });
+          }
           final List<String> pathElements = settings.name.split('/');
           if (pathElements[0] != '') {
             return null;

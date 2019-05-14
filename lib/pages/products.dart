@@ -41,12 +41,7 @@ class _ProductsPageState extends State<ProductsPage> {
         ),
         Divider(),
           LogoutListTile(),
-        ListTile(
-          title: Text('Logout'),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/');
-          },
-        ),
+        
       ]),
     );
   }

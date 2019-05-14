@@ -116,7 +116,8 @@ class _AuthPageState extends State<AuthPage> {
     if (successInfo['success']) {
       print('success');
       if (_authMode == AuthMode.Login) {
-        Navigator.pushReplacementNamed(context, '/products');
+        print('LOGIN SUCCESS');
+        //Navigator.pushReplacementNamed(context, '/');
       } else {
         setState(() {
           _authMode = AuthMode.Login;
