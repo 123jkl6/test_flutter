@@ -7,6 +7,7 @@ import '../scoped_models/main.dart';
 import '../models/product.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
+import '../widgets/form_input/location.dart';
 
 class ProductEditPage extends StatefulWidget {
   @override
@@ -21,6 +22,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
     'description': null,
     'price': null,
     'image': 'assets/food.jpg',
+
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -114,6 +116,10 @@ class _CreateProductPageState extends State<ProductEditPage> {
                   model.selectProduct, model.selectedProduct),
             );
     });
+  }
+
+  void _setLocation(){
+
   }
 
   void saveAction(Function addProduct, Function updateProduct,
@@ -221,6 +227,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
                 _buildDescriptionField(product),
                 _buildPriceField(product),
                 SizedBox(height: 10.0),
+                LocationInput(),
                 _buildSwitch(),
                 _buildSaveButton(),
               ]),
