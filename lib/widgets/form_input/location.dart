@@ -7,6 +7,9 @@ import '../../models/location_data.dart';
 import '../helpers/ensure-visible.dart';
 
 class LocationInput extends StatefulWidget {
+  final Function setLocation;
+  LocationInput(this.setLocation);
+
   @override
   State<StatefulWidget> createState() {
     return _LocationInputState();
@@ -37,6 +40,7 @@ class _LocationInputState extends State<LocationInput> {
       setState(() {
         _staticMapUri = null;
       });
+      widget.setLocation(null);
       return;
     }
     final Uri uri = Uri.https('maps.googleapis.com', '/maps/api/geocode/json',
@@ -61,6 +65,7 @@ class _LocationInputState extends State<LocationInput> {
         width: 500,
         height: 300,
         maptype: StaticMapViewType.roadmap);
+        widget.setLocation(locationData);
     setState(() {
       _addressInputController.text = locationData.address;
       _staticMapUri = staticMapUri;
@@ -90,7 +95,7 @@ class _LocationInputState extends State<LocationInput> {
           focusNode: _addressInputFocusNode,
         ),
         SizedBox(height: 10.0),
-        Image.network(_staticMapUri.toString()),
+        _staticMapUri!=null?Image.network(_staticMapUri.toString()):Text('No location.'),
       ],
     );
   }

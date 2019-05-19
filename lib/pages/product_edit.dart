@@ -5,6 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../scoped_models/main.dart';
 
 import '../models/product.dart';
+import '../models/location_data.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
 import '../widgets/form_input/location.dart';
@@ -22,6 +23,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
     'description': null,
     'price': null,
     'image': 'assets/food.jpg',
+    'location':null,
 
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -118,8 +120,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
     });
   }
 
-  void _setLocation(){
-
+  void _setLocation(LocationData locationData){
+    _formData['location'] = locationData;
   }
 
   void saveAction(Function addProduct, Function updateProduct,
@@ -137,6 +139,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
+        location:_formData['location'],
       ).then((bool success) {
         if (success) {
           Navigator.pushReplacementNamed(context, '/home').then((_) =>
@@ -164,6 +167,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
+
       ).then((bool success) {
         if (success) {
           Navigator.pushReplacementNamed(context, '/home').then((_) =>
@@ -227,7 +231,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
                 _buildDescriptionField(product),
                 _buildPriceField(product),
                 SizedBox(height: 10.0),
-                LocationInput(),
+                LocationInput(_setLocation),
                 _buildSwitch(),
                 _buildSaveButton(),
               ]),

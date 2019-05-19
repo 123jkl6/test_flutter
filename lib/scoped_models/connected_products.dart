@@ -11,6 +11,7 @@ import 'dart:convert';
 import '../models/auth.dart';
 import '../models/product.dart';
 import '../models/user.dart';
+import '../models/location_data.dart';
 
 mixin ConnectedProductsModel on Model {
   final String _url = 'https://ngtestflutter.firebaseio.com/';
@@ -73,7 +74,7 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   Future<bool> addProduct(
-      {String title, String description, String image, double price}) async {
+      {String title, String description, String image, double price,LocationData locationData}) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> productData = {
@@ -84,6 +85,9 @@ mixin ProductsModel on ConnectedProductsModel {
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
+      'loc_lat':locationData.latitude,
+      'loc_lng':locationData.longitude,
+      'loc_address':locationData.address,
     };
 
     try {
@@ -348,7 +352,7 @@ mixin UserModel on ConnectedProductsModel {
       prefs.setString('test_flutter_token', responseBody['idToken']);
       prefs.setString('test_flutter_user_email', email);
       prefs.setString('test_flutter_user_id', responseBody['localId']);
-      prefs.setString('text_flutter_expiry_time', expiryTime.toIso8601String());
+      prefs.setString('test_flutter_expiry_time', expiryTime.toIso8601String());
     } else if (responseBody['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'Email not found.';
     } else if (responseBody['error']['message'] == 'INVALID_PASSWORD') {
@@ -366,7 +370,10 @@ mixin UserModel on ConnectedProductsModel {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String token = prefs.getString('test_flutter_token');
     final String expiryTimeString = prefs.getString('test_flutter_expiry_time');
-    if (token != null) {
+    final String userEmailString = prefs.getString('test_flutter_user_email');
+    final String userIdString = prefs.getString('test_flutter_user_id');
+    if (token != null && expiryTimeString!=null && userEmailString!=null && userIdString!=null) {
+      //print(expiryTimeString);
       final DateTime now = DateTime.now();
       final DateTime parsedExpiryTime = DateTime.parse(expiryTimeString);
       if (parsedExpiryTime.isBefore(now)) {
