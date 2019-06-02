@@ -85,7 +85,7 @@ class ProductCard extends StatelessWidget {
           child: _buildTitlePriceRow(),
         ),
         SizedBox(width: 8.0),
-        AddressTag(address: 'Union Square, San Francisco'),
+        AddressTag(address: product.location.address),
         UserTag(user: product.userEmail),
         _buildButtonBar(context),
       ],

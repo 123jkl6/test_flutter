@@ -72,21 +72,24 @@ class _LocationInputState extends State<LocationInput> {
           address: input, latitude: latitude, longitude: longitude);
     }
 
-    final StaticMapProvider staticMapProvider =
-        StaticMapProvider('AIzaSyASUlBYy7YODpbnRDBUgsXBINAEpY8GlmI');
-    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers([
-      Marker('position', 'Position', _locationData.latitude,
-          _locationData.longitude)
-    ],
-        center: Location(_locationData.latitude, _locationData.longitude),
-        width: 500,
-        height: 300,
-        maptype: StaticMapViewType.roadmap);
-    widget.setLocation(_locationData);
-    setState(() {
-      _addressInputController.text = _locationData.address;
-      _staticMapUri = staticMapUri;
-    });
+    //execute only if the page is still mounted and not navigated.
+    if (mounted) {
+      final StaticMapProvider staticMapProvider =
+          StaticMapProvider('AIzaSyASUlBYy7YODpbnRDBUgsXBINAEpY8GlmI');
+      final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers([
+        Marker('position', 'Position', _locationData.latitude,
+            _locationData.longitude)
+      ],
+          center: Location(_locationData.latitude, _locationData.longitude),
+          width: 500,
+          height: 300,
+          maptype: StaticMapViewType.roadmap);
+      widget.setLocation(_locationData);
+      setState(() {
+        _addressInputController.text = _locationData.address;
+        _staticMapUri = staticMapUri;
+      });
+    }
   }
 
   void _updateLocation() {
