@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:io';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped_models/main.dart';
@@ -9,6 +9,7 @@ import '../models/location_data.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
 import '../widgets/form_input/location.dart';
+import '../widgets/form_input/image.dart';
 
 class ProductEditPage extends StatefulWidget {
   @override
@@ -22,7 +23,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
     'title': null,
     'description': null,
     'price': null,
-    'image': 'assets/food.jpg',
+    'image': null,
     'location': null,
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -31,8 +32,21 @@ class _CreateProductPageState extends State<ProductEditPage> {
   final _titleFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _priceFocusNode = FocusNode();
+  final _titleTextController = TextEditingController();
+  final _descriptionTextController = TextEditingController();
 
   Widget _buildTitleField(Product product) {
+    if (product == null && _titleTextController.text.trim()==''){
+      _titleTextController.text='';
+    } else if (product != null && _titleTextController.text.trim()==''){
+      _titleTextController.text=product.title;
+    } else if (product != null && _titleTextController.text.trim() != ''){
+      _titleTextController.text=_titleTextController.text;
+    } else if (product == null && _titleTextController.text.trim()!='') {
+      _titleTextController.text = _titleTextController.text;
+    } else {
+      _titleTextController.text = '';
+    }
     return EnsureVisibleWhenFocused(
       focusNode: _titleFocusNode,
       child: TextFormField(
@@ -53,13 +67,19 @@ class _CreateProductPageState extends State<ProductEditPage> {
   }
 
   Widget _buildDescriptionField(Product product) {
+    if (product==null && _descriptionTextController.text.trim()==''){
+      _descriptionTextController.text = '';
+    } else if (product != null && _descriptionTextController.text.trim()==''){
+      _descriptionTextController.text=product.title;
+    }
     return EnsureVisibleWhenFocused(
       focusNode: _descriptionFocusNode,
       child: TextFormField(
           focusNode: _descriptionFocusNode,
           decoration: InputDecoration(labelText: 'Product Description'),
           maxLines: 4,
-          initialValue: product == null ? '' : product.description.toString(),
+        
+          controller:_descriptionTextController,
           validator: (String value) {
             if (value.isEmpty || value.length < 10) {
               return "Description is required and should be 10+ characters long. ";
@@ -123,19 +143,22 @@ class _CreateProductPageState extends State<ProductEditPage> {
     _formData['location'] = locationData;
   }
 
+  void _setImage(File image){
+    _formData['image'] = image;
+  }
+
   void saveAction(Function addProduct, Function updateProduct,
       Function selectProduct, Product product) {
-    if (!_formKey.currentState.validate()) {
+    if (!_formKey.currentState.validate() || _formData['image']==null && product==null) {
       //stop executing if validation fails.
       return;
     }
     _formKey.currentState.save();
-    print(_formData['title'] + ' is being saved.');
     print(_formData.toString());
     if (product == null) {
       addProduct(
-        title: _formData['title'],
-        description: _formData['description'],
+        title: _titleTextController.text,
+        description: _descriptionTextController.text,
         image: _formData['image'],
         price: _formData['price'],
         locationData: _formData['location'],
@@ -231,7 +254,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
                 _buildPriceField(product),
                 SizedBox(height: 10.0),
                 LocationInput(_setLocation, product),
-                _buildSwitch(),
+                SizedBox(height:10.0),
+                ImageInput(setImage:_setImage,product:product),
                 _buildSaveButton(),
               ]),
         ),

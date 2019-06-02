@@ -1,10 +1,13 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:mime/mime.dart';
 
 import 'dart:convert';
 
@@ -73,19 +76,51 @@ mixin ProductsModel on ConnectedProductsModel {
     return _showFavorites;
   }
 
+  Future<Map<String,dynamic>> uploadImage(File image,{String imagePath}) async {
+    final mimeTypeData = lookupMimeType(image.path).split('/');
+    final imageUploadRequest = http.MultipartRequest('POST',Uri.parse('https://us-central1-ngtestflutter.cloudfunctions.net/storeImage'));
+    final file = await http.MultipartFile.fromPath('image',image.path,contentType:MediaType(mimeTypeData[0],mimeTypeData[1]));
+    imageUploadRequest.files.add(file);
+    if (imagePath != null) {
+      imageUploadRequest.fields['imagePath'] = Uri.encodeComponent(imagePath);
+    }
+    imageUploadRequest.headers['Authorization'] = 'Bearer ${_authenticatedUser.token}';
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse); 
+      if (response.statusCode!=200 && response.statusCode!=201){
+        print('Image upload failed.');
+        print(json.decode(response.body));
+        return null;
+      }
+      final responseData = json.decode(response.body); 
+      return responseData; 
+    } catch (error ){
+      print(error);
+      return null;
+    }
+  }
+
   Future<bool> addProduct(
       {String title,
       String description,
-      String image,
+      File image,
       double price,
       LocationData locationData}) async {
     _isLoading = true;
     notifyListeners();
+    final uploadData = await uploadImage(image);
+    if (uploadData==null){
+      print('Upload failed');
+      return false;
+    }
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
-      'image':
-          'https://upload.wikimedia.org/wikipedia/commons/8/88/Philippine_Food.jpg',
+      'imagePath':
+          uploadData['imagePath'],
+          'imageUrl':
+          uploadData['imageUrl'],
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
@@ -112,7 +147,7 @@ mixin ProductsModel on ConnectedProductsModel {
         id: responseData['id'],
         title: title,
         description: description,
-        image: image,
+        image: uploadData['imageUrl'],
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
@@ -275,8 +310,8 @@ mixin ProductsModel on ConnectedProductsModel {
       description: selectedProduct.description,
       image: selectedProduct.image,
       price: selectedProduct.price,
-      userEmail: _authenticatedUser.email,
-      userId: _authenticatedUser.id,
+      userEmail: selectedProduct.userEmail,
+      userId: selectedProduct.id,
       location: selectedProduct.location,
       isFavorite: newFavoriteStatus,
     );
