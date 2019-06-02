@@ -105,7 +105,6 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   void login(MainModel model) async {
-    print(_userAuth);
     if (!_formKey.currentState.validate()) {
       //if not valid, stop execution.
       return;

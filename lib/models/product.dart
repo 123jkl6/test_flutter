@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import './location_data.dart';
+
 class Product {
   final String id;
   final String title;
@@ -8,6 +10,7 @@ class Product {
   final double price;
   final String userEmail;
   final String userId;
+  final LocationData location;
   final bool isFavorite;
 
   Product({
@@ -18,7 +21,8 @@ class Product {
     @required this.price,
     @required this.userEmail,
     @required this.userId,
-    this.isFavorite=false//default false, not required property. 
+    @required this.location,
+    this.isFavorite=false,//default false, not required property. 
   });
 
   String toString(){

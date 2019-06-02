@@ -24,6 +24,7 @@ dependencies:
   scoped_model: ^1.0.1
   http: ^0.12.0+2
   rxdart: ^0.22.0
+  location: ^2.3.5
   map_view:
     git:
       url: git://github.com/Eimji/flutter_google_map_view.git

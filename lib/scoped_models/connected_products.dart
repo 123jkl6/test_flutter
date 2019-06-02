@@ -74,7 +74,11 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   Future<bool> addProduct(
-      {String title, String description, String image, double price,LocationData locationData}) async {
+      {String title,
+      String description,
+      String image,
+      double price,
+      LocationData locationData}) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> productData = {
@@ -85,9 +89,9 @@ mixin ProductsModel on ConnectedProductsModel {
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
-      'loc_lat':locationData.latitude,
-      'loc_lng':locationData.longitude,
-      'loc_address':locationData.address,
+      'loc_lat': locationData.latitude,
+      'loc_lng': locationData.longitude,
+      'loc_address': locationData.address,
     };
 
     try {
@@ -112,6 +116,7 @@ mixin ProductsModel on ConnectedProductsModel {
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
+        location: locationData,
       );
       _products.add(product);
       notifyListeners();
@@ -126,7 +131,11 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   Future<bool> updateProduct(
-      {String title, String description, String image, double price}) {
+      {String title,
+      String description,
+      String image,
+      double price,
+      LocationData locationData}) {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> updatedData = {
@@ -137,6 +146,9 @@ mixin ProductsModel on ConnectedProductsModel {
       'price': price,
       'userEmail': selectedProduct.userEmail,
       'userId': selectedProduct.userId,
+      'loc_lat': locationData.latitude,
+      'loc_lng': locationData.longitude,
+      'loc_address': locationData.address,
     };
     return http
         .put(
@@ -155,6 +167,8 @@ mixin ProductsModel on ConnectedProductsModel {
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
+        location: locationData,
+        isFavorite: selectedProduct.isFavorite,
       );
 
       _products[selectedProductIndex] = product;
@@ -226,6 +240,10 @@ mixin ProductsModel on ConnectedProductsModel {
           price: productData['price'],
           userEmail: productData['userEmail'],
           userId: productData['userId'],
+          location: LocationData(
+              address: productData['loc_address'],
+              latitude: productData['loc_lat'],
+              longitude: productData['loc_lng']),
           isFavorite: productData['wishlistUsers'] == null
               ? false
               : (productData['wishlistUsers'] as Map<String, dynamic>)
@@ -259,6 +277,7 @@ mixin ProductsModel on ConnectedProductsModel {
       price: selectedProduct.price,
       userEmail: _authenticatedUser.email,
       userId: _authenticatedUser.id,
+      location: selectedProduct.location,
       isFavorite: newFavoriteStatus,
     );
     http.Response response;
@@ -280,6 +299,7 @@ mixin ProductsModel on ConnectedProductsModel {
         price: selectedProduct.price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
+        location: selectedProduct.location,
         isFavorite: !newFavoriteStatus,
       );
     }
@@ -359,9 +379,13 @@ mixin UserModel on ConnectedProductsModel {
       message = 'Password is invalid. ';
     } else if (responseBody['error']['message'] == 'EMAIL_EXISTS') {
       message = 'Email already exists';
+    } else {
+      message = 'An unknown error has occured. ';
     }
     _isLoading = false;
-    _userSubject.add(true);
+    if (!hasError) {
+      _userSubject.add(true);
+    }
     notifyListeners();
     return {'success': !hasError, 'message': message};
   }
@@ -372,7 +396,10 @@ mixin UserModel on ConnectedProductsModel {
     final String expiryTimeString = prefs.getString('test_flutter_expiry_time');
     final String userEmailString = prefs.getString('test_flutter_user_email');
     final String userIdString = prefs.getString('test_flutter_user_id');
-    if (token != null && expiryTimeString!=null && userEmailString!=null && userIdString!=null) {
+    if (token != null &&
+        expiryTimeString != null &&
+        userEmailString != null &&
+        userIdString != null) {
       //print(expiryTimeString);
       final DateTime now = DateTime.now();
       final DateTime parsedExpiryTime = DateTime.parse(expiryTimeString);

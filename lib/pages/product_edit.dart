@@ -23,8 +23,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
     'description': null,
     'price': null,
     'image': 'assets/food.jpg',
-    'location':null,
-
+    'location': null,
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -120,7 +119,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
     });
   }
 
-  void _setLocation(LocationData locationData){
+  void _setLocation(LocationData locationData) {
     _formData['location'] = locationData;
   }
 
@@ -132,14 +131,14 @@ class _CreateProductPageState extends State<ProductEditPage> {
     }
     _formKey.currentState.save();
     print(_formData['title'] + ' is being saved.');
-
+    print(_formData.toString());
     if (product == null) {
       addProduct(
         title: _formData['title'],
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
-        location:_formData['location'],
+        locationData: _formData['location'],
       ).then((bool success) {
         if (success) {
           Navigator.pushReplacementNamed(context, '/home').then((_) =>
@@ -167,7 +166,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
         description: _formData['description'],
         image: _formData['image'],
         price: _formData['price'],
-
+        locationData: _formData['location'],
       ).then((bool success) {
         if (success) {
           Navigator.pushReplacementNamed(context, '/home').then((_) =>
@@ -231,7 +230,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
                 _buildDescriptionField(product),
                 _buildPriceField(product),
                 SizedBox(height: 10.0),
-                LocationInput(_setLocation),
+                LocationInput(_setLocation, product),
                 _buildSwitch(),
                 _buildSaveButton(),
               ]),
