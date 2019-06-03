@@ -375,13 +375,13 @@ mixin UserModel on ConnectedProductsModel {
     http.Response response;
     if (authMode == AuthMode.Login) {
       response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyAwsYQRLW5FZXnIsC1Yr39qowCkg2ePDBk',
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=',
         headers: {'Content-Type': 'application/json'},
         body: json.encode(authData),
       );
     } else {
       response = await http.post(
-        "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyAwsYQRLW5FZXnIsC1Yr39qowCkg2ePDBk",
+        "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=",
         headers: {'Content-Type': 'application/json'},
         body: json.encode(authData),
       );
