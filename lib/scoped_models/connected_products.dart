@@ -112,6 +112,8 @@ mixin ProductsModel on ConnectedProductsModel {
     final uploadData = await uploadImage(image);
     if (uploadData==null){
       print('Upload failed');
+      _isLoading = false;
+      notifyListeners();
       return false;
     }
     final Map<String, dynamic> productData = {

@@ -34,25 +34,27 @@ class _CreateProductPageState extends State<ProductEditPage> {
   final _priceFocusNode = FocusNode();
   final _titleTextController = TextEditingController();
   final _descriptionTextController = TextEditingController();
+  final _priceTextController = TextEditingController();
 
   Widget _buildTitleField(Product product) {
     if (product == null && _titleTextController.text.trim()==''){
       _titleTextController.text='';
     } else if (product != null && _titleTextController.text.trim()==''){
       _titleTextController.text=product.title;
-    } else if (product != null && _titleTextController.text.trim() != ''){
-      _titleTextController.text=_titleTextController.text;
-    } else if (product == null && _titleTextController.text.trim()!='') {
-      _titleTextController.text = _titleTextController.text;
-    } else {
-      _titleTextController.text = '';
     }
+    // } else if (product != null && _titleTextController.text.trim() != ''){
+    //   _titleTextController.text=_titleTextController.text;
+    // } else if (product == null && _titleTextController.text.trim()!='') {
+    //   _titleTextController.text = _titleTextController.text;
+    // } else {
+    //   _titleTextController.text = '';
+    // }
     return EnsureVisibleWhenFocused(
       focusNode: _titleFocusNode,
       child: TextFormField(
           focusNode: _titleFocusNode,
           decoration: InputDecoration(labelText: 'Product Name'),
-          initialValue: product == null ? '' : product.title.toString(),
+          controller:_titleTextController,
           validator: (String value) {
             if (value.isEmpty || value.length < 5) {
               return "Product name is required and should be 5+ characters long. ";
@@ -70,7 +72,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
     if (product==null && _descriptionTextController.text.trim()==''){
       _descriptionTextController.text = '';
     } else if (product != null && _descriptionTextController.text.trim()==''){
-      _descriptionTextController.text=product.title;
+      _descriptionTextController.text=product.description;
     }
     return EnsureVisibleWhenFocused(
       focusNode: _descriptionFocusNode,
@@ -94,13 +96,18 @@ class _CreateProductPageState extends State<ProductEditPage> {
   }
 
   Widget _buildPriceField(Product product) {
+    if (product==null && _priceTextController.text.trim()==''){
+      _priceTextController.text = '';
+    } else if (product != null && _priceTextController.text.trim()==''){
+      _priceTextController.text=product.price.toString();
+    }
     return EnsureVisibleWhenFocused(
       focusNode: _priceFocusNode,
       child: TextFormField(
           focusNode: _priceFocusNode,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(labelText: 'Product Price'),
-          initialValue: product == null ? '' : product.price.toString(),
+          controller: _priceTextController,
           validator: (String value) {
             if (value.isEmpty ||
                 !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
@@ -114,15 +121,15 @@ class _CreateProductPageState extends State<ProductEditPage> {
           }),
     );
   }
-
-  Widget _buildSwitch() {
-    return Switch(
-      value: true,
-      onChanged: (bool value) {
-        print('Switch ' + value.toString());
-      },
-    );
-  }
+  // pointless now to build switch
+  // Widget _buildSwitch() {
+  //   return Switch(
+  //     value: true,
+  //     onChanged: (bool value) {
+  //       print('Switch ' + value.toString());
+  //     },
+  //   );
+  // }
 
   Widget _buildSaveButton() {
     return ScopedModelDescendant<MainModel>(
