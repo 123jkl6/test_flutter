@@ -76,26 +76,32 @@ mixin ProductsModel on ConnectedProductsModel {
     return _showFavorites;
   }
 
-  Future<Map<String,dynamic>> uploadImage(File image,{String imagePath}) async {
+  Future<Map<String, dynamic>> uploadImage(File image,
+      {String imagePath}) async {
     final mimeTypeData = lookupMimeType(image.path).split('/');
-    final imageUploadRequest = http.MultipartRequest('POST',Uri.parse('https://us-central1-ngtestflutter.cloudfunctions.net/storeImage'));
-    final file = await http.MultipartFile.fromPath('image',image.path,contentType:MediaType(mimeTypeData[0],mimeTypeData[1]));
+    final imageUploadRequest = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://us-central1-ngtestflutter.cloudfunctions.net/storeImage'));
+    final file = await http.MultipartFile.fromPath('image', image.path,
+        contentType: MediaType(mimeTypeData[0], mimeTypeData[1]));
     imageUploadRequest.files.add(file);
     if (imagePath != null) {
       imageUploadRequest.fields['imagePath'] = Uri.encodeComponent(imagePath);
     }
-    imageUploadRequest.headers['Authorization'] = 'Bearer ${_authenticatedUser.token}';
+    imageUploadRequest.headers['Authorization'] =
+        'Bearer ${_authenticatedUser.token}';
     try {
       final streamedResponse = await imageUploadRequest.send();
-      final response = await http.Response.fromStream(streamedResponse); 
-      if (response.statusCode!=200 && response.statusCode!=201){
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode != 200 && response.statusCode != 201) {
         print('Image upload failed.');
         print(json.decode(response.body));
         return null;
       }
-      final responseData = json.decode(response.body); 
-      return responseData; 
-    } catch (error ){
+      final responseData = json.decode(response.body);
+      return responseData;
+    } catch (error) {
       print(error);
       return null;
     }
@@ -110,7 +116,7 @@ mixin ProductsModel on ConnectedProductsModel {
     _isLoading = true;
     notifyListeners();
     final uploadData = await uploadImage(image);
-    if (uploadData==null){
+    if (uploadData == null) {
       print('Upload failed');
       _isLoading = false;
       notifyListeners();
@@ -119,10 +125,8 @@ mixin ProductsModel on ConnectedProductsModel {
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
-      'imagePath':
-          uploadData['imagePath'],
-      'imageUrl':
-          uploadData['imageUrl'],
+      'imagePath': uploadData['imagePath'],
+      'imageUrl': uploadData['imageUrl'],
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
@@ -150,7 +154,7 @@ mixin ProductsModel on ConnectedProductsModel {
         title: title,
         description: description,
         image: uploadData['imageUrl'],
-        imagePath:uploadData['imagePath'],
+        imagePath: uploadData['imagePath'],
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
@@ -171,17 +175,30 @@ mixin ProductsModel on ConnectedProductsModel {
   Future<bool> updateProduct(
       {String title,
       String description,
-      String image,
+      File image,
       double price,
-      LocationData locationData}) {
+      LocationData locationData}) async {
     _isLoading = true;
     notifyListeners();
+    String imageUrl = selectedProduct.image;
+    String imagePath = selectedProduct.imagePath;
+    if (image != null) {
+      final uploadData = await uploadImage(image);
+      if (uploadData == null) {
+        print('Upload failed');
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      //reassign
+      imageUrl = uploadData['imageUrl'];
+      imagePath = uploadData['imagePath'];
+    }
     final Map<String, dynamic> updatedData = {
       'title': title,
       'description': description,
-      'imageUrl':
-          selectedProduct.image,
-      'imagePath':selectedProduct.imagePath,
+      'imageUrl': imageUrl,
+      'imagePath': imagePath,
       'price': price,
       'userEmail': selectedProduct.userEmail,
       'userId': selectedProduct.userId,
@@ -202,8 +219,8 @@ mixin ProductsModel on ConnectedProductsModel {
         id: selectedProduct.id,
         title: title,
         description: description,
-        image: image,
-        //imagePath
+        image: imageUrl,
+        imagePath:imagePath,
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
