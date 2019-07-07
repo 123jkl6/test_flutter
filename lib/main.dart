@@ -14,7 +14,7 @@ import './pages/manage_products.dart';
 
 void main() {
   //debugPaintSizeEnabled = true;
-  MapView.setApiKey('AIzaSyBY72rz8eSmNxBG_gOtMsRCSBJfOMpu-m8');
+  MapView.setApiKey('');
   runApp(MyApp());
 }
 

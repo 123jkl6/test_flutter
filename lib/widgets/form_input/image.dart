@@ -27,8 +27,8 @@ class _ImageInputState extends State<ImageInput> {
     ).then((File image) {
       setState(() {
         _imageFile = image;
-      });widget.setImage(image);
-
+      });
+      widget.setImage(image);
       Navigator.pop(context);
     });
   }

@@ -121,7 +121,7 @@ mixin ProductsModel on ConnectedProductsModel {
       'description': description,
       'imagePath':
           uploadData['imagePath'],
-          'imageUrl':
+      'imageUrl':
           uploadData['imageUrl'],
       'price': price,
       'userEmail': _authenticatedUser.email,
@@ -150,6 +150,7 @@ mixin ProductsModel on ConnectedProductsModel {
         title: title,
         description: description,
         image: uploadData['imageUrl'],
+        imagePath:uploadData['imagePath'],
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
@@ -178,8 +179,9 @@ mixin ProductsModel on ConnectedProductsModel {
     final Map<String, dynamic> updatedData = {
       'title': title,
       'description': description,
-      'image':
-          'https://upload.wikimedia.org/wikipedia/commons/8/88/Philippine_Food.jpg',
+      'imageUrl':
+          selectedProduct.image,
+      'imagePath':selectedProduct.imagePath,
       'price': price,
       'userEmail': selectedProduct.userEmail,
       'userId': selectedProduct.userId,
@@ -201,6 +203,7 @@ mixin ProductsModel on ConnectedProductsModel {
         title: title,
         description: description,
         image: image,
+        //imagePath
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
@@ -273,7 +276,8 @@ mixin ProductsModel on ConnectedProductsModel {
           id: productId,
           title: productData['title'],
           description: productData['description'],
-          image: productData['image'],
+          image: productData['imageUrl'],
+          imagePath: productData['imagePath'],
           price: productData['price'],
           userEmail: productData['userEmail'],
           userId: productData['userId'],

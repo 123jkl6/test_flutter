@@ -101,7 +101,7 @@ class _LocationInputState extends State<LocationInput> {
   Future<String> _getAddress(double latitude, double longitude) async {
     final uri = Uri.https('maps.googleapis.com', '/maps/api/geocode/json', {
       'latlng': '${latitude.toString()},${longitude.toString()}',
-      'key': 'AIzaSyASUlBYy7YODpbnRDBUgsXBINAEpY8GlmI'
+      'key': ''
     });
     final http.Response response = await http.get(uri);
     final decodedResponse = json.decode(response.body);
@@ -114,6 +114,8 @@ class _LocationInputState extends State<LocationInput> {
     location.requestService().then((bool allowed) async {
       if (allowed) {
         final currentLocation = await location.getLocation();
+        print(currentLocation.latitude);
+        print(currentLocation.longitude);
         final address = await _getAddress(
             currentLocation.latitude, currentLocation.longitude);
         _getStaticMap(address,

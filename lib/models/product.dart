@@ -11,6 +11,7 @@ class Product {
   final String userEmail;
   final String userId;
   final LocationData location;
+  final String imagePath;
   final bool isFavorite;
 
   Product({
@@ -22,6 +23,7 @@ class Product {
     @required this.userEmail,
     @required this.userId,
     @required this.location,
+    @required this.imagePath,
     this.isFavorite=false,//default false, not required property. 
   });
 
