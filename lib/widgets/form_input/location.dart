@@ -53,7 +53,7 @@ class _LocationInputState extends State<LocationInput> {
     }
     if (geocode) {
       final Uri uri = Uri.https('maps.googleapis.com', '/maps/api/geocode/json',
-          {'address': input, 'key': 'AIzaSyASUlBYy7YODpbnRDBUgsXBINAEpY8GlmI'});
+          {'address': input, 'key': ''});
       final http.Response response = await http.get(uri);
       final decodedResponse = json.decode(response.body);
       final formattedAddress =
@@ -75,7 +75,7 @@ class _LocationInputState extends State<LocationInput> {
     //execute only if the page is still mounted and not navigated.
     if (mounted) {
       final StaticMapProvider staticMapProvider =
-          StaticMapProvider('AIzaSyASUlBYy7YODpbnRDBUgsXBINAEpY8GlmI');
+          StaticMapProvider('');
       final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers([
         Marker('position', 'Position', _locationData.latitude,
             _locationData.longitude)
