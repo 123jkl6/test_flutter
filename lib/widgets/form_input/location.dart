@@ -8,6 +8,8 @@ import '../../models/location_data.dart';
 import '../../models/product.dart';
 import '../helpers/ensure-visible.dart';
 
+import '../../models/keys.dart';
+
 class LocationInput extends StatefulWidget {
   final Function setLocation;
   final Product product;
@@ -53,7 +55,7 @@ class _LocationInputState extends State<LocationInput> {
     }
     if (geocode) {
       final Uri uri = Uri.https('maps.googleapis.com', '/maps/api/geocode/json',
-          {'address': input, 'key': ''});
+          {'address': input, 'key': Keys.geoApi});
       final http.Response response = await http.get(uri);
       final decodedResponse = json.decode(response.body);
       final formattedAddress =
@@ -75,7 +77,7 @@ class _LocationInputState extends State<LocationInput> {
     //execute only if the page is still mounted and not navigated.
     if (mounted) {
       final StaticMapProvider staticMapProvider =
-          StaticMapProvider('');
+          StaticMapProvider(Keys.geoApi);
       final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers([
         Marker('position', 'Position', _locationData.latitude,
             _locationData.longitude)
@@ -101,7 +103,7 @@ class _LocationInputState extends State<LocationInput> {
   Future<String> _getAddress(double latitude, double longitude) async {
     final uri = Uri.https('maps.googleapis.com', '/maps/api/geocode/json', {
       'latlng': '${latitude.toString()},${longitude.toString()}',
-      'key': ''
+      'key': Keys.geoApi,
     });
     final http.Response response = await http.get(uri);
     final decodedResponse = json.decode(response.body);

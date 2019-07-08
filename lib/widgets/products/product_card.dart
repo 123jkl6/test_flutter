@@ -47,8 +47,10 @@ class ProductCard extends StatelessWidget {
             color: Theme.of(context).accentColor,
             onPressed: () {
               print(product.title + ' details pressed. ');
+              model.selectProduct(model.allProducts[index].id);
               Navigator.pushNamed<bool>(
-                  context, '/product/' + model.allProducts[index].id);
+                  context, '/product/' + model.allProducts[index].id)
+                  .then((_)=>model.selectProduct(null)); //reset in the then block to unselect product when pressing back button
             },
           ),
           IconButton(

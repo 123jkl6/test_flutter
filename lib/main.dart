@@ -12,9 +12,11 @@ import './pages/product.dart';
 import './pages/products.dart';
 import './pages/manage_products.dart';
 
+import './models/keys.dart';
+
 void main() {
   //debugPaintSizeEnabled = true;
-  MapView.setApiKey('');
+  MapView.setApiKey(Keys.geoApi);
   runApp(MyApp());
 }
 

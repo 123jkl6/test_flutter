@@ -15,6 +15,7 @@ import '../models/auth.dart';
 import '../models/product.dart';
 import '../models/user.dart';
 import '../models/location_data.dart';
+import '../models/keys.dart';
 
 mixin ConnectedProductsModel on Model {
   final String _url = 'https://ngtestflutter.firebaseio.com/';
@@ -206,12 +207,12 @@ mixin ProductsModel on ConnectedProductsModel {
       'loc_lng': locationData.longitude,
       'loc_address': locationData.address,
     };
-    return http
-        .put(
-            _url +
-                'products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
-            body: json.encode(updatedData))
-        .then((http.Response response) {
+    try {
+      final http.Response response = await http.put(
+          _url +
+              'products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
+          body: json.encode(updatedData));
+
       print(response);
       _isLoading = false;
 
@@ -220,7 +221,7 @@ mixin ProductsModel on ConnectedProductsModel {
         title: title,
         description: description,
         image: imageUrl,
-        imagePath:imagePath,
+        imagePath: imagePath,
         price: price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
@@ -232,11 +233,11 @@ mixin ProductsModel on ConnectedProductsModel {
       notifyListeners();
 
       return true;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
       return false;
-    });
+    }
   }
 
   Future<bool> deleteProduct() {
@@ -332,6 +333,7 @@ mixin ProductsModel on ConnectedProductsModel {
       title: selectedProduct.title,
       description: selectedProduct.description,
       image: selectedProduct.image,
+      imagePath: selectedProduct.imagePath,
       price: selectedProduct.price,
       userEmail: selectedProduct.userEmail,
       userId: selectedProduct.id,
@@ -354,6 +356,7 @@ mixin ProductsModel on ConnectedProductsModel {
         title: selectedProduct.title,
         description: selectedProduct.description,
         image: selectedProduct.image,
+        imagePath: selectedProduct.imagePath,
         price: selectedProduct.price,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
@@ -395,16 +398,17 @@ mixin UserModel on ConnectedProductsModel {
       'password': password,
       'returnSecureToken': true,
     };
+    print(authData);
     http.Response response;
     if (authMode == AuthMode.Login) {
       response = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=',
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key='+Keys.authApi,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(authData),
       );
     } else {
       response = await http.post(
-        "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=",
+        "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key="+Keys.authApi,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(authData),
       );

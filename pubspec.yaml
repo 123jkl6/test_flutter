@@ -27,6 +27,7 @@ dependencies:
   location: ^2.3.5
   image_picker: ^0.6.0+8
   mime: ^0.9.6+1
+  url_launcher: ^3.0.2
   map_view:
     git:
       url: git://github.com/Eimji/flutter_google_map_view.git
