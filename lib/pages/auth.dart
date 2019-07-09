@@ -20,10 +20,17 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   AuthMode _authMode = AuthMode.Login;
   bool _acceptTerms = false;
   AnimationController _controller;
+  Animation<Offset> _slideAnimation;
 
   void initState() {
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    //animate between 2 values
+    // now curved animation is not restricted to 0 and 1
+    //-2.0 means move twice its height
+    _slideAnimation =
+        Tween<Offset>(begin: Offset(0.0, -2.0), end: Offset(0.0, 0.0)).animate(
+            CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     super.initState();
   }
 
@@ -56,21 +63,25 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
     return FadeTransition(
       //only between 0 and 1
       opacity: CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-      child: TextFormField(
-        decoration: InputDecoration(
-            labelText: 'Confirm Password',
-            filled: true,
-            fillColor: Colors.white),
-        obscureText: true,
-        validator: (String value) {
-          if (_passwordTextController.text != value && _authMode == AuthMode.Signup) {
-            return "Passwords do not match. ";
-          }
-        },
-        onSaved: (String value) {
-          //do nothing, rely on only password field.
-          //_userAuth['password'] = value;
-        },
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: TextFormField(
+          decoration: InputDecoration(
+              labelText: 'Confirm Password',
+              filled: true,
+              fillColor: Colors.white),
+          obscureText: true,
+          validator: (String value) {
+            if (_passwordTextController.text != value &&
+                _authMode == AuthMode.Signup) {
+              return "Passwords do not match. ";
+            }
+          },
+          onSaved: (String value) {
+            //do nothing, rely on only password field.
+            //_userAuth['password'] = value;
+          },
+        ),
       ),
     );
   }

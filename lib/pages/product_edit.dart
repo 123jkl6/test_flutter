@@ -63,7 +63,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
           onSaved: (String value) {
             print('title' + value);
 
-            _formData['title'] = value;
+            _formData['title'] = _titleTextController.text.trim();
           }),
     );
   }
@@ -164,10 +164,10 @@ class _CreateProductPageState extends State<ProductEditPage> {
     print(_formData.toString());
     if (product == null) {
       addProduct(
-        title: _titleTextController.text,
-        description: _descriptionTextController.text,
+        title: _titleTextController.text.trim(),
+        description: _descriptionTextController.text.trim(),
         image: _formData['image'],
-        price: _formData['price'],
+        price: double.parse(_priceTextController.text.trim()),
         locationData: _formData['location'],
       ).then((bool success) {
         if (success) {
@@ -192,10 +192,10 @@ class _CreateProductPageState extends State<ProductEditPage> {
       });
     } else {
       updateProduct(
-        title: _formData['title'],
-        description: _formData['description'],
+        title: _titleTextController.text.trim(),
+        description: _descriptionTextController.text.trim(),
         image: _formData['image'],
-        price: _formData['price'],
+        price: double.parse(_priceTextController.text.trim()),
         locationData: _formData['location'],
       ).then((bool success) {
         if (success) {

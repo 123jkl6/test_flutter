@@ -96,48 +96,57 @@ class ProductPage extends StatelessWidget {
         return Future.value(false);
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(product.title),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            FadeInImage(
-                image: NetworkImage(product.image),
-                height: 300.0,
-                fit: BoxFit.cover,
-                fadeInDuration: Duration(milliseconds: 700),
-                placeholder: AssetImage('assets/food.jpg')),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: TitleDefault(title: product.title),
-            ),
-            _buildAddressPriceRow(
-                product.location.address, product.price.toString()),
-            Container(
-              margin: EdgeInsets.only(top: 10.0),
-              padding: EdgeInsets.all(10.0),
-              alignment: Alignment.center,
-              child: Text(
-                product.description,
-                textAlign: TextAlign.center,
+        //comment out to allow transition from product card to product page,
+        //and also allow seamless animation between image and appbar when scrolling product page
+        // appBar: AppBar(
+        //   title: Text(product.title),
+        // ),
+        //
+        body: CustomScrollView(
+          //hold all sliver widgets
+          slivers: <Widget>[
+            //animate as app is scrolled
+            SliverAppBar(
+              //max height, shrink as it is being scrolled down. 
+              expandedHeight: 256.0,
+              //always stay at the top
+              pinned: true,
+              //space to shrink and grow
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(product.title),
+                background: Hero(
+                  // let flutter know the same hero tag is being animated in /widgets/products/product_card.dart
+                  tag: product.id,
+                  child: FadeInImage(
+                      image: NetworkImage(product.image),
+                      height: 300.0,
+                      fit: BoxFit.cover,
+                      fadeInDuration: Duration(milliseconds: 700),
+                      placeholder: AssetImage('assets/food.jpg')),
+                ),
               ),
             ),
-            // Container(
-            //     padding: EdgeInsets.all(10.0),
-            //     child: RaisedButton(
-            //       color: Theme.of(context).accentColor,
-            //       textColor: Colors.white,
-            //       child: Text('DELETE'),
-            //       onPressed: () {
-            //         print('Delete pressed. ');
-            //         _showWarningDialog(context);
-            //       },
-            //     ))
+            SliverList(
+                delegate: SliverChildListDelegate([
+              Container(
+                padding: EdgeInsets.all(10.0),
+                child: TitleDefault(title: product.title),
+              ),
+              _buildAddressPriceRow(
+                  product.location.address, product.price.toString()),
+              Container(
+                margin: EdgeInsets.only(top: 10.0),
+                padding: EdgeInsets.all(10.0),
+                alignment: Alignment.center,
+                child: Text(
+                  product.description,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ])),
           ],
         ),
-        floatingActionButton: ProductFab(product:product),
+        floatingActionButton: ProductFab(product: product),
       ),
     );
   }

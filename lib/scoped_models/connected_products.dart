@@ -486,6 +486,8 @@ mixin UserModel on ConnectedProductsModel {
     _authenticatedUser = null;
     //clear timer like in javascript.
     _authTimer.cancel();
+    //reset on logout, so that selectedProductId is null upon relogin. 
+    _selectedProductId = null;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('test_flutter_token');
     prefs.remove('test_flutter_user_email');

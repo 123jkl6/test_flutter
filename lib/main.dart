@@ -6,13 +6,14 @@ import 'package:map_view/map_view.dart';
 import './scoped_models/main.dart';
 
 import './models/product.dart';
+import './models/keys.dart';
 
 import './pages/auth.dart';
 import './pages/product.dart';
 import './pages/products.dart';
 import './pages/manage_products.dart';
 
-import './models/keys.dart';
+import './widgets/helpers/custom_route.dart'; 
 
 void main() {
   //debugPaintSizeEnabled = true;
@@ -65,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           },
           // '/home': (BuildContext context) {
           //   return ProductsPage(_model);
-          // },
+          // },product
           '/admin': (BuildContext context) {
             return !_isAuthenticated
                 ? AuthPage()
@@ -88,9 +89,13 @@ class _MyAppState extends State<MyApp> {
                 _model.allProducts.firstWhere((Product product) {
               return product.id == productId;
             });
-            return MaterialPageRoute<bool>(builder: (context) {
-              return ProductPage(product: product);
-            });
+            //previous MaterialPageRoute impl
+            // return MaterialPageRoute<bool>(builder: (context) {
+            //   return ProductPage(product: product);
+            // });
+            return CustomRoute<bool>(
+              builder:(BuildContext context) => !_isAuthenticated ? AuthPage() : ProductPage(product:product),
+            );
           }
           return null;
         },
