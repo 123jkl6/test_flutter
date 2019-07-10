@@ -37,10 +37,16 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.6.1
   flutter_test:
     sdk: flutter
 
-
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/web_hi_res_512.png"
+dependency_overrides:
+  image: 2.0.7
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
