@@ -15,7 +15,7 @@ import '../models/auth.dart';
 import '../models/product.dart';
 import '../models/user.dart';
 import '../models/location_data.dart';
-import '../models/keys.dart';
+import '../shared/keys.dart';
 
 mixin ConnectedProductsModel on Model {
   final String _url = 'https://ngtestflutter.firebaseio.com/';
@@ -272,8 +272,12 @@ mixin ProductsModel on ConnectedProductsModel {
     }
   }
 
-  Future<Null> fetchProducts({onlyForUser = false}) {
+  Future<Null> fetchProducts({onlyForUser = false, clearExisting = false}) {
     _isLoading = true;
+    //only clear on productlistpage, not the main
+    if (clearExisting){
+      _products = [];
+    }
     notifyListeners();
     return http
         .get(_url + 'products.json?auth=${_authenticatedUser.token}')
@@ -365,7 +369,6 @@ mixin ProductsModel on ConnectedProductsModel {
       );
     }
     _products[selectedProductIndex] = updatedProduct;
-
     //inform ScopedModel there is a change in state
     notifyListeners();
   }

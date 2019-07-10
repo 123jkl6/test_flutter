@@ -12,8 +12,8 @@ class Products extends StatelessWidget {
     print('constructed product widget ');
   }
 
-  Widget _buildProductItem(Product product, int index) {
-    return ProductCard(product: product, index: index);
+  Widget _buildProductItem(Product product) {
+    return ProductCard(product: product);
   }
 
   Widget _buildProductList(List<Product> products) {
@@ -24,7 +24,7 @@ class Products extends StatelessWidget {
     if (products.length > 0) {
       productCards = ListView.builder(
         itemBuilder: (BuildContext context, int index) {
-         return  _buildProductItem(products[index], index);
+         return  _buildProductItem(products[index]);
         },
         itemCount: products.length,
       );

@@ -19,7 +19,7 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   @override
   initState() {
-    widget.model.fetchProducts(onlyForUser : true);
+    widget.model.fetchProducts(onlyForUser: true, clearExisting: true);
     super.initState();
   }
 
@@ -45,10 +45,47 @@ class _ProductListPageState extends State<ProductListPage> {
       return ListView.builder(
         itemBuilder: (BuildContext context, int index) {
           return Dismissible(
+            confirmDismiss: (DismissDirection direction) async {
+              bool deleteConfirm = false;
+              if (direction == DismissDirection.endToStart) {
+                await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text(
+                            "Are you sure you want to delete this product?"),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("Confirm"),
+                            onPressed: () {
+                              print("confirm delete");
+                              deleteConfirm = true;
+                              Navigator.pop(context, true);
+                            },
+                          ),
+                          FlatButton(
+                            color: Colors.grey,
+                            child: Text("Cancel"),
+                            onPressed: () {
+                              print("cancel delete");
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    });
+              } else {
+                return true;
+              }
+
+              print(deleteConfirm);
+              return deleteConfirm;
+            },
             key: Key(model.allProducts[index].title),
             onDismissed: (DismissDirection direction) {
               if (direction == DismissDirection.endToStart) {
                 print('Swiped end to start.');
+
                 //acually delete the product.
                 model.selectProduct(model.allProducts[index].id);
                 model.deleteProduct();

@@ -8,7 +8,7 @@ import '../../models/location_data.dart';
 import '../../models/product.dart';
 import '../helpers/ensure-visible.dart';
 
-import '../../models/keys.dart';
+import '../../shared/keys.dart';
 
 class LocationInput extends StatefulWidget {
   final Function setLocation;
@@ -129,6 +129,20 @@ class _LocationInputState extends State<LocationInput> {
       }
     }).catchError((err) {
       print(err);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text("Could not fetch location"),
+                content: Text("Please add adress manually"),
+                actions: <Widget>[
+                  FlatButton(
+                      child: Text("Okay"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
+                ]);
+          });
     });
   }
 

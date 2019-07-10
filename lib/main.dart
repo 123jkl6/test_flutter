@@ -6,14 +6,16 @@ import 'package:map_view/map_view.dart';
 import './scoped_models/main.dart';
 
 import './models/product.dart';
-import './models/keys.dart';
+import './shared/keys.dart';
 
 import './pages/auth.dart';
 import './pages/product.dart';
 import './pages/products.dart';
 import './pages/manage_products.dart';
 
-import './widgets/helpers/custom_route.dart'; 
+import './widgets/helpers/custom_route.dart';
+
+import './shared/adaptive_theme.dart';
 
 void main() {
   //debugPaintSizeEnabled = true;
@@ -49,20 +51,12 @@ class _MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: _model, // only one instance in entire app
       child: MaterialApp(
-        theme: ThemeData(
-          brightness: Brightness.light,
-          primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple,
-          fontFamily: 'Oswald',
-          buttonColor: Colors.deepPurple,
-        ),
+        theme: getAdaptiveThemeData(context),
         // '/' and home are reserved, use one or the other.
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) {
-            return !_isAuthenticated
-                ? AuthPage()
-                : ProductsPage(_model);
+            return !_isAuthenticated ? AuthPage() : ProductsPage(_model);
           },
           // '/home': (BuildContext context) {
           //   return ProductsPage(_model);
@@ -74,7 +68,7 @@ class _MyAppState extends State<MyApp> {
           }
         },
         onGenerateRoute: (RouteSettings settings) {
-          if (!_isAuthenticated){
+          if (!_isAuthenticated) {
             return MaterialPageRoute<bool>(builder: (context) {
               return AuthPage();
             });
@@ -94,7 +88,9 @@ class _MyAppState extends State<MyApp> {
             //   return ProductPage(product: product);
             // });
             return CustomRoute<bool>(
-              builder:(BuildContext context) => !_isAuthenticated ? AuthPage() : ProductPage(product:product),
+              builder: (BuildContext context) => !_isAuthenticated
+                  ? AuthPage()
+                  : ProductPage(product: product),
             );
           }
           return null;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:io';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -8,6 +9,7 @@ import '../models/product.dart';
 import '../models/location_data.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
+import '../widgets/ui_elements/adaptive_progress_indicator.dart';
 import '../widgets/form_input/location.dart';
 import '../widgets/form_input/image.dart';
 
@@ -37,10 +39,10 @@ class _CreateProductPageState extends State<ProductEditPage> {
   final _priceTextController = TextEditingController();
 
   Widget _buildTitleField(Product product) {
-    if (product == null && _titleTextController.text.trim()==''){
-      _titleTextController.text='';
-    } else if (product != null && _titleTextController.text.trim()==''){
-      _titleTextController.text=product.title;
+    if (product == null && _titleTextController.text.trim() == '') {
+      _titleTextController.text = '';
+    } else if (product != null && _titleTextController.text.trim() == '') {
+      _titleTextController.text = product.title;
     }
     // } else if (product != null && _titleTextController.text.trim() != ''){
     //   _titleTextController.text=_titleTextController.text;
@@ -54,7 +56,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
       child: TextFormField(
           focusNode: _titleFocusNode,
           decoration: InputDecoration(labelText: 'Product Name'),
-          controller:_titleTextController,
+          controller: _titleTextController,
           validator: (String value) {
             if (value.isEmpty || value.length < 5) {
               return "Product name is required and should be 5+ characters long. ";
@@ -69,10 +71,11 @@ class _CreateProductPageState extends State<ProductEditPage> {
   }
 
   Widget _buildDescriptionField(Product product) {
-    if (product==null && _descriptionTextController.text.trim()==''){
+    if (product == null && _descriptionTextController.text.trim() == '') {
       _descriptionTextController.text = '';
-    } else if (product != null && _descriptionTextController.text.trim()==''){
-      _descriptionTextController.text=product.description;
+    } else if (product != null &&
+        _descriptionTextController.text.trim() == '') {
+      _descriptionTextController.text = product.description;
     }
     return EnsureVisibleWhenFocused(
       focusNode: _descriptionFocusNode,
@@ -80,8 +83,7 @@ class _CreateProductPageState extends State<ProductEditPage> {
           focusNode: _descriptionFocusNode,
           decoration: InputDecoration(labelText: 'Product Description'),
           maxLines: 4,
-        
-          controller:_descriptionTextController,
+          controller: _descriptionTextController,
           validator: (String value) {
             if (value.isEmpty || value.length < 10) {
               return "Description is required and should be 10+ characters long. ";
@@ -96,10 +98,10 @@ class _CreateProductPageState extends State<ProductEditPage> {
   }
 
   Widget _buildPriceField(Product product) {
-    if (product==null && _priceTextController.text.trim()==''){
+    if (product == null && _priceTextController.text.trim() == '') {
       _priceTextController.text = '';
-    } else if (product != null && _priceTextController.text.trim()==''){
-      _priceTextController.text=product.price.toString();
+    } else if (product != null && _priceTextController.text.trim() == '') {
+      _priceTextController.text = product.price.toString();
     }
     return EnsureVisibleWhenFocused(
       focusNode: _priceFocusNode,
@@ -110,14 +112,12 @@ class _CreateProductPageState extends State<ProductEditPage> {
           controller: _priceTextController,
           validator: (String value) {
             if (value.isEmpty ||
-                !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
+                !RegExp(r'^(?:[1-9]\d*|0)?(?:[.,]\d+)?$').hasMatch(value)) {
               return "Price is required and should be a number. ";
             }
           },
           onSaved: (String value) {
             print('price' + value);
-
-            _formData['price'] = double.parse(value);
           }),
     );
   }
@@ -135,7 +135,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return model.isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: AdaptiveProgressIndicator())
           : RaisedButton(
               color: Theme.of(context).primaryColor,
               textColor: Theme.of(context).primaryColorLight,
@@ -150,13 +151,14 @@ class _CreateProductPageState extends State<ProductEditPage> {
     _formData['location'] = locationData;
   }
 
-  void _setImage(File image){
+  void _setImage(File image) {
     _formData['image'] = image;
   }
 
   void saveAction(Function addProduct, Function updateProduct,
       Function selectProduct, Product product) {
-    if (!_formKey.currentState.validate() || _formData['image']==null && product==null) {
+    if (!_formKey.currentState.validate() ||
+        _formData['image'] == null && product == null) {
       //stop executing if validation fails.
       return;
     }
@@ -167,7 +169,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
         title: _titleTextController.text.trim(),
         description: _descriptionTextController.text.trim(),
         image: _formData['image'],
-        price: double.parse(_priceTextController.text.trim()),
+        price: double.parse(
+            _priceTextController.text.replaceFirst(RegExp(r","), ".").trim()),
         locationData: _formData['location'],
       ).then((bool success) {
         if (success) {
@@ -195,7 +198,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
         title: _titleTextController.text.trim(),
         description: _descriptionTextController.text.trim(),
         image: _formData['image'],
-        price: double.parse(_priceTextController.text.trim()),
+        price: double.parse(
+            _priceTextController.text.replaceFirst(RegExp(r","), ".").trim()),
         locationData: _formData['location'],
       ).then((bool success) {
         if (success) {
@@ -218,7 +222,6 @@ class _CreateProductPageState extends State<ProductEditPage> {
               });
         }
       });
-      ;
     }
   }
 
@@ -261,8 +264,8 @@ class _CreateProductPageState extends State<ProductEditPage> {
                 _buildPriceField(product),
                 SizedBox(height: 10.0),
                 LocationInput(_setLocation, product),
-                SizedBox(height:10.0),
-                ImageInput(setImage:_setImage,product:product),
+                SizedBox(height: 10.0),
+                ImageInput(setImage: _setImage, product: product),
                 _buildSaveButton(),
               ]),
         ),

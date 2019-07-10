@@ -8,7 +8,6 @@ import './product_edit.dart';
 import './product_list.dart';
 
 class ManageProducts extends StatelessWidget {
-
   final MainModel model;
 
   ManageProducts({this.model});
@@ -18,6 +17,8 @@ class ManageProducts extends StatelessWidget {
       child: Column(
         children: <Widget>[
           AppBar(
+            elevation:
+              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
             //Assume what the leading icon should be
             automaticallyImplyLeading: false,
             title: Text('Choose'),
@@ -44,6 +45,9 @@ class ManageProducts extends StatelessWidget {
         drawer: _buildSideDrawer(context),
         appBar: AppBar(
           title: Text('Manage products'),
+          //iOS typcally has no drop shadows
+          elevation:
+              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
           bottom: TabBar(tabs: <Widget>[
             Tab(icon: Icon(Icons.create), text: 'Create Product'),
             Tab(icon: Icon(Icons.list), text: 'My Products')
@@ -52,7 +56,7 @@ class ManageProducts extends StatelessWidget {
         body: TabBarView(
           children: <Widget>[
             ProductEditPage(),
-            ProductListPage(model:model),
+            ProductListPage(model: model),
           ],
         ),
       ),

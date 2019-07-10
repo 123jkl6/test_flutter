@@ -12,9 +12,8 @@ import '../ui_elements/title_default.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
-  final int index;
 
-  ProductCard({@required this.product, @required this.index}) {
+  ProductCard({@required this.product}) {
     print(product);
   }
 
@@ -31,7 +30,10 @@ class ProductCard extends StatelessWidget {
           flex: 10,
           child: TitleDefault(title: product.title),
         ),
-        PriceTag(product.price.toString()),
+        Flexible(
+          flex:10,
+          child:PriceTag(product.price.toString()),
+        ),
       ],
     );
   }
@@ -47,21 +49,22 @@ class ProductCard extends StatelessWidget {
             color: Theme.of(context).accentColor,
             onPressed: () {
               print(product.title + ' details pressed. ');
-              model.selectProduct(model.allProducts[index].id);
-              Navigator.pushNamed<bool>(
-                  context, '/product/' + model.allProducts[index].id)
-                  .then((_)=>model.selectProduct(null)); //reset in the then block to unselect product when pressing back button
+              model.selectProduct(product.id);
+              Navigator.pushNamed<bool>(context, '/product/' + product.id).then(
+                  (_) => model.selectProduct(
+                      null)); //reset in the then block to unselect product when pressing back button
             },
           ),
           IconButton(
-            icon: Icon(model.allProducts[index].isFavorite
-                ? Icons.favorite
-                : Icons.favorite_border),
+            icon: Icon(
+                product.isFavorite ? Icons.favorite : Icons.favorite_border),
             color: Colors.red,
             onPressed: () {
               print(product.title + ' favorite pressed. ');
-              model.selectProduct(model.allProducts[index].id);
+              model.selectProduct(product.id);
               model.toggleFavoriteStatus();
+              //deselect product
+              model.selectProduct(null);
             },
           )
         ],
@@ -75,8 +78,8 @@ class ProductCard extends StatelessWidget {
       children: <Widget>[
         Hero(
           //does nothing
-          tag:product.id,
-          child:FadeInImage(
+          tag: product.id,
+          child: FadeInImage(
               image: NetworkImage(product.image),
               height: 300.0,
               fit: BoxFit.cover,
@@ -90,7 +93,7 @@ class ProductCard extends StatelessWidget {
           //color:Colors.red,
           child: _buildTitlePriceRow(),
         ),
-        SizedBox(width: 8.0),
+        SizedBox(height: 8.0),
         AddressTag(address: product.location.address),
         UserTag(user: product.userEmail),
         _buildButtonBar(context),
